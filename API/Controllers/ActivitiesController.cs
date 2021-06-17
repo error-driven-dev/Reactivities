@@ -1,4 +1,5 @@
 
+using System.Net.Mail;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,6 +32,11 @@ namespace API.Controllers
             [HttpPost]
             public async Task<IActionResult> CreateActivity(Activity activity){
                 return Ok ( await Mediator.Send(new Create.Command{Activity = activity} ));
+            }
+
+            [HttpPut]
+            public async Task<IActionResult> EditActivity(Activity activity){
+                return Ok( await Mediator.Send(new Edit.Command{Activity = activity}));
             }
         
         }
