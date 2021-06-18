@@ -1,4 +1,5 @@
 
+using System.Threading;
 using System.Net.Mail;
 using System.Linq;
 using System.Collections.Generic;
@@ -16,10 +17,10 @@ namespace API.Controllers
     {
      
             [HttpGet]
-            public async Task<ActionResult<List<Activity>>> GetActivities()
+            public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken token)
             {
                 
-                return await Mediator.Send(new List.Query());
+                return await Mediator.Send(new List.Query(), token);
             }
 
             [HttpGet("{id}")]

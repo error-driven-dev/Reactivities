@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MediatR;
 using Domain;
@@ -23,7 +24,19 @@ namespace Application.Activities
 
             public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Activities.ToListAsync();
+                // //example set up for using cancelaation token to cancel long requests -- NEED TO PASS cancellation token from controller
+                // try
+                // {
+                //      cancellationToken.ThrowIfCancellationRequested();
+           
+                    
+                // }
+                // catch (Exception ex) when (ex is TaskCanceledException)
+                // {
+                //     Console.WriteLine("Task was cancelled");
+                // }
+                
+                         return await _context.Activities.ToListAsync();
             }
         }
     }
