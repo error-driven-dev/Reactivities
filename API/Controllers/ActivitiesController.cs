@@ -34,9 +34,17 @@ namespace API.Controllers
                 return Ok ( await Mediator.Send(new Create.Command{Activity = activity} ));
             }
 
-            [HttpPut]
-            public async Task<IActionResult> EditActivity(Activity activity){
+            [HttpPut("{id}")]
+            //activity passed from body may not have the id, so will have to get from param root
+            public async Task<IActionResult> EditActivity(Guid id, Activity activity){
+
+                activity.Id = id;
                 return Ok( await Mediator.Send(new Edit.Command{Activity = activity}));
+            }
+
+            [HttpDelete("{id}")]
+            public async Task<IActionResult> DeleteActivity(Guid id) {
+                return Ok(await Mediator.Send( new Delete.Command{Id = id}));
             }
         
         }
