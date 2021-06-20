@@ -7,12 +7,15 @@ import { Container } from "semantic-ui-react";
 import { NavBar } from "./NavBar";
 import { Activity } from "../models/activities";
 import agent from "../api/agent";
+import LoadingComponents from "./LoadingComponents";
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedActivity, setSelectedActivity] =
     useState<Activity | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     agent.Activities.list()
@@ -24,6 +27,7 @@ function App() {
         //res.date = res.date.split('T')[0];
       })
         setActivities(response);
+        setLoading(false);
       });
   }, []);
 
@@ -43,20 +47,44 @@ function App() {
   };
 
   const handleCreateOrEditActivity = (activity: Activity) => {
-    activity.id
-      ? setActivities([
+setSubmitting(true)
+    if(activity.id){
+      agent.Activities.update(activity).then (() => {
+        setActivities([
           ...activities.filter((x) => x.id !== activity.id),
           activity,
-        ])
-      : setActivities([...activities, { ...activity, id: uuidv4() }]);
-    setEditMode(false);
-    setSelectedActivity(activity);
+        ]);
+        setEditMode(false);
+        setSelectedActivity(activity);
+        setSubmitting(false);
+      })
+
+      
+    }else {
+      activity.id = uuidv4();
+      agent.Activities.create(activity).then( () => {
+        setActivities([...activities, activity]);
+        setEditMode(false);
+        setSelectedActivity(activity);
+        setSubmitting(false);
+      }).catch((err) => {
+        console.log(err);
+      })
+  
+    }
+
   };
 
   const handleDeleteActivity = (id: string) => {
-    setActivities([...activities.filter((x) => x.id !== id)]);
-  };
+setSubmitting(true);
+agent.Activities.delete(id).then(()=> {
+  setActivities([...activities.filter((x) => x.id !== id)]);
+  setSubmitting(false);
+})
 
+   
+  };
+ if(loading) return <LoadingComponents inverted={true} content='Lodading app...'/>
   return (
     <>
       <NavBar formOpen={handleFormOpen}></NavBar>
@@ -72,6 +100,7 @@ function App() {
           editMode={editMode}
           submitForm={handleCreateOrEditActivity}
           deleteActivity={handleDeleteActivity}
+          submitting={submitting}
         ></ActivityDashboard>
       </Container>
     </>
