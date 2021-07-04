@@ -1,12 +1,13 @@
 import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
 import { SyntheticEvent } from "react";
+import { Link } from "react-router-dom";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import { useStore } from "../../../app/stores/store";
 
 export default observer(function ActivityList() {
   const { activityStore } = useStore();
-  const { activities, selectActivity, deleteActivity, loading } = activityStore;
+  const { activitiesByDate, deleteActivity, loading } = activityStore;
   const [target, setTarget] = useState("");
 
   const handleActivityDelete = (
@@ -19,7 +20,7 @@ export default observer(function ActivityList() {
   return (
     <Segment>
       <Item.Group divided>
-        {activities.map((activity) => (
+        {activitiesByDate.map((activity) => (
           <Item key={activity.id}>
             <Item.Content>
               <Item.Header>{activity.title}</Item.Header>
@@ -42,7 +43,8 @@ export default observer(function ActivityList() {
                   color="red"
                 />
                 <Button
-                  onClick={() => selectActivity(activity.id)}
+                  as={Link}
+                  to={`/activities/${activity.id}`}
                   floated="right"
                   content="view"
                   color="blue"

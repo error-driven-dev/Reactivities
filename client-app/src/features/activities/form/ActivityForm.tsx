@@ -1,14 +1,19 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
+import { Activity } from "../../../app/models/activities";
+import { Link, useHistory, useParams } from "react-router-dom";
+import LoadingComponents from "../../../app/layout/LoadingComponents";
+import { v4 as uuid } from "uuid";
+
 
 export default observer(function ActivityForm() {
   const { activityStore } = useStore();
-  const { selectedActivity, formClose, createOrEditActivity, loading } =
+  const {  updateActivity, createActivity, loading, loadActivity} =
     activityStore;
   const [activity, setActivity] = useState(
-    selectedActivity ?? {
+     {
       id: "",
       title: "",
       category: "",
@@ -18,6 +23,15 @@ export default observer(function ActivityForm() {
       venue: "",
     }
   );
+  const {id} = useParams<{id:string}>();
+  const history = useHistory();
+  useEffect(() => {
+    if (id){
+    loadActivity(id).then( activity =>
+     setActivity(activity!));
+    }
+
+  }, [id, loadActivity])
   const handleInput = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -28,10 +42,21 @@ export default observer(function ActivityForm() {
 
     console.log(updated);
   };
-
+  function handleSubmit() {
+    if (activity.id.length === 0) {
+        let newActivity = {
+            ...activity,
+            id: uuid()
+        };
+        createActivity(newActivity).then(() => history.push(`/activities/${newActivity.id}`))
+    } else {
+        updateActivity(activity).then(() => history.push(`/activities/${activity.id}`))
+    }
+}
+//if(loadingInitial) return <LoadingComponents inverted={true} content='Loading activity...'></LoadingComponents>
   return (
     <Segment clearing>
-      <Form onSubmit={() => createOrEditActivity(activity)} autoComplete="off">
+      <Form onSubmit={ handleSubmit} autoComplete="off">
         <Form.Input
           placeholder="Title"
           name="title"
@@ -77,8 +102,9 @@ export default observer(function ActivityForm() {
           content="Submit"
         ></Button>
         <Button
-          onClick={formClose}
-          floated="right"
+        as={Link}
+to='/activities'
+        floated="right"
           positive
           type="button"
           content="Cancel"
@@ -87,3 +113,5 @@ export default observer(function ActivityForm() {
     </Segment>
   );
 });
+
+
