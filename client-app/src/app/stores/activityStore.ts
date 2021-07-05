@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 
 import agent from "../api/agent";
 import { Activity } from "../models/activities";
@@ -36,6 +36,21 @@ export default class ActivityStore {
   get activitiesByDate(){
     return Array.from(this.activityRegistry.values()).sort((a,b)=> Date.parse(a.date) - Date.parse(b.date));
   }
+get groupedActivities(){
+  //turns entire result object into array of arrays where value 1 is date and value 2 is array of activity objects
+  return Object.entries(
+    //returns activities object where activity is the key and activities are array
+    this.activitiesByDate.reduce((activities, activity) =>{
+    //gets date of current activity
+    const date = activity.date;
+    //gets activities key(date) exists copy all items into array and add new activity; if not create the key and add current activity array
+    activities[date] = activities[date] ? [...activities[date],activity] : [activity];
+    return activities;
+    //as definition removes the implicit any error
+  },{} as{[key:string]: Activity[]})
+  )
+}
+
   loadActivity = async(id:string) => {
     let activity = this.getActivity(id);
     console.log(id);
