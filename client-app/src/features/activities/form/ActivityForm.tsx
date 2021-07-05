@@ -1,37 +1,30 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
-import { Activity } from "../../../app/models/activities";
 import { Link, useHistory, useParams } from "react-router-dom";
-import LoadingComponents from "../../../app/layout/LoadingComponents";
 import { v4 as uuid } from "uuid";
-
 
 export default observer(function ActivityForm() {
   const { activityStore } = useStore();
-  const {  updateActivity, createActivity, loading, loadActivity} =
+  const { updateActivity, createActivity, loading, loadActivity } =
     activityStore;
-  const [activity, setActivity] = useState(
-     {
-      id: "",
-      title: "",
-      category: "",
-      description: "",
-      date: "",
-      city: "",
-      venue: "",
-    }
-  );
-  const {id} = useParams<{id:string}>();
+  const [activity, setActivity] = useState({
+    id: "",
+    title: "",
+    category: "",
+    description: "",
+    date: "",
+    city: "",
+    venue: "",
+  });
+  const { id } = useParams<{ id: string }>();
   const history = useHistory();
   useEffect(() => {
-    if (id){
-    loadActivity(id).then( activity =>
-     setActivity(activity!));
+    if (id) {
+      loadActivity(id).then((activity) => setActivity(activity!));
     }
-
-  }, [id, loadActivity])
+  }, [id, loadActivity]);
   const handleInput = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -39,24 +32,26 @@ export default observer(function ActivityForm() {
     const updated = { ...activity, [name]: value };
 
     setActivity(updated);
-
-    console.log(updated);
   };
   function handleSubmit() {
     if (activity.id.length === 0) {
-        let newActivity = {
-            ...activity,
-            id: uuid()
-        };
-        createActivity(newActivity).then(() => history.push(`/activities/${newActivity.id}`))
+      let newActivity = {
+        ...activity,
+        id: uuid(),
+      };
+      createActivity(newActivity).then(() =>
+        history.push(`/activities/${newActivity.id}`)
+      );
     } else {
-        updateActivity(activity).then(() => history.push(`/activities/${activity.id}`))
+      updateActivity(activity).then(() =>
+        history.push(`/activities/${activity.id}`)
+      );
     }
-}
-//if(loadingInitial) return <LoadingComponents inverted={true} content='Loading activity...'></LoadingComponents>
+  }
+  //if(loadingInitial) return <LoadingComponents inverted={true} content='Loading activity...'></LoadingComponents>
   return (
     <Segment clearing>
-      <Form onSubmit={ handleSubmit} autoComplete="off">
+      <Form onSubmit={handleSubmit} autoComplete="off">
         <Form.Input
           placeholder="Title"
           name="title"
@@ -102,9 +97,9 @@ export default observer(function ActivityForm() {
           content="Submit"
         ></Button>
         <Button
-        as={Link}
-to='/activities'
-        floated="right"
+          as={Link}
+          to="/activities"
+          floated="right"
           positive
           type="button"
           content="Cancel"
@@ -113,5 +108,3 @@ to='/activities'
     </Segment>
   );
 });
-
-

@@ -19,9 +19,7 @@ export default class ActivityStore {
 
   loadActivites = async () => {
     this.setLoadingInitial(true);
-if(this.activityRegistry.size >= 1  ){
-this.setLoadingInitial(false);
-}
+
     try {
       const activities = await agent.Activities.list();
 
